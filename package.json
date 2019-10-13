@@ -1,0 +1,25 @@
+{
+  "name": "webgl-distortion",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "parcel ./src/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nazhenhuiyi/webgl-distortion.git"
+  },
+  "author": "zilin.rong",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nazhenhuiyi/webgl-distortion/issues"
+  },
+  "homepage": "https://github.com/nazhenhuiyi/webgl-distortion#readme",
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4"
+  },
+  "dependencies": {
+    "three": "^0.109.0"
+  }
+}
