@@ -1,9 +1,7 @@
-import { DisplaymentCanvas } from "./canvas";
 import * as THREE from "three";
-import "./styles.css";
-const displaymentCanvs = new DisplaymentCanvas();
-const image = require("./sample.jpg");
-var vertex = `
+
+const image = require("./disp.jpg");
+const vertex = `
         varying vec2 vUv;
         void main() {
           vUv = uv;
@@ -11,7 +9,7 @@ var vertex = `
         }
     `;
 
-var fragment = `
+const fragment = `
     varying vec2 vUv;
 
     uniform sampler2D texture;
@@ -29,6 +27,8 @@ var fragment = `
         gl_FragColor = texture2D(texture, distortedPosition);
     }
 `;
+
+
 class App {
   constructor() {
     this.width = 200;
@@ -36,19 +36,22 @@ class App {
     this.init();
   }
   init() {
-    const button = document.createElement("button");
-    button.textContent = "生成";
-    button.addEventListener("click", () => {
-      mat.uniforms.disp.value = new THREE.CanvasTexture(
-        displaymentCanvs.canvas
-      );
-      renderer.render(scene, camera);
-    });
-    document.body.appendChild(button);
+    const upload = document.querySelector("#upload-input")
+    const app = document.querySelector("#app")
+    upload.addEventListener('change', (e) => {
+      const file = upload.files[0]
+      if (file) {
+        const url = URL.createObjectURL(file)
+        const texture1 = loader.load(url, texture => {
+          mat.uniforms.texture.value = texture
+          renderer.setSize(300, (texture.image.height / texture.image.width) * 300);
+          renderer.render(scene, camera);
+        });
+      }
+    })
     const scene = (this.scene = new THREE.Scene());
-    var camera = new THREE.OrthographicCamera(-100, 100, 100, -100, 1, 1000);
+    const camera = new THREE.OrthographicCamera(-100, 100, 100, -100, 1, 1000);
     camera.position.z = 5;
-
     const renderer = (this.renderer = new THREE.WebGLRenderer({
       antialias: false
     }));
@@ -56,19 +59,19 @@ class App {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setClearColor(0xffffff, 0.0);
     renderer.setSize(this.width, this.height);
-    document.body.appendChild(renderer.domElement);
-    var loader = new THREE.TextureLoader();
-    var texture1 = loader.load(image, texture => {
-      renderer.setSize(300, (texture.image.height / texture.image.width) * 100);
-      renderer.render(scene, camera);
-    });
-    var disp = new THREE.CanvasTexture(displaymentCanvs.canvas);
+    app.appendChild(renderer.domElement);
+    const loader = new THREE.TextureLoader();
+    // const texture1 = loader.load(image, texture => {
+    //   renderer.setSize(300, (texture.image.height / texture.image.width) * 100);
+    //   renderer.render(scene, camera);
+    // });
+    const disp = loader.load(image)
 
-    var mat = new THREE.ShaderMaterial({
+    const mat = new THREE.ShaderMaterial({
       uniforms: {
         // effectFactor: { type: "f", value: intensity },
         dispFactor: { type: "f", value: 0.0 },
-        texture: { type: "t", value: texture1 },
+        texture: { type: "t", value: null },
         disp: { type: "t", value: disp }
       },
 
@@ -78,8 +81,8 @@ class App {
       opacity: 1.0
     });
 
-    var geometry = new THREE.PlaneBufferGeometry(this.width, this.height, 1);
-    var plane = new THREE.Mesh(geometry, mat);
+    const geometry = new THREE.PlaneBufferGeometry(this.width, this.height, 1);
+    const plane = new THREE.Mesh(geometry, mat);
     scene.add(plane);
   }
 }
